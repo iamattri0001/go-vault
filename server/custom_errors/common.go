@@ -13,6 +13,8 @@ var ErrMap = map[error]int{
 	ErrInvalidPasswordFormat: 400,
 	ErrInvalidUsernameFormat: 400,
 	ErrUsernameTaken:         400,
+	ErrUserNotFound:          404,
+	ErrInvalidCredentials:    401,
 }
 
 func GetCode(err error) int {

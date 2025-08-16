@@ -21,5 +21,6 @@ func addUserRoutes(r *gin.Engine, service *service.Service) {
 	authGrp := r.Group("/api/v1/auth")
 	{
 		authGrp.POST("/register", auth.NewRegisterController(service).GetResponse)
+		authGrp.POST("/login", auth.NewLoginController(service).GetResponse)
 	}
 }

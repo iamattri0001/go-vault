@@ -40,6 +40,7 @@ func NewApp() (*App, error) {
 }
 
 func (a *App) Run() {
+	defer a.Close()
 	port := a.Config.ServiceConfig.Port
 	address := fmt.Sprintf(":%d", port)
 	router.SetupRoutes(a.GinEngine, a.Injector.Service)
@@ -48,4 +49,8 @@ func (a *App) Run() {
 	}
 }
 
-func (a *App) Close() {}
+func (a *App) Close() {
+	if err := a.MongoDB.Close(); err != nil {
+		log.Fatalf("Failed to close MongoDB connection: %v", err)
+	}
+}

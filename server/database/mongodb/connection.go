@@ -55,3 +55,7 @@ func NewMongoDbConnection(config *config.MongoConfig) (*MongoDBConnection, error
 func (c *MongoDBConnection) GetDatabase() *mongo.Database {
 	return c.client.Database(c.dbName)
 }
+
+func (c *MongoDBConnection) Close() error {
+	return c.client.Disconnect(context.Background())
+}

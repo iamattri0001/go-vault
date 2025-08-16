@@ -18,14 +18,14 @@ func NewRegisterController(service *service.Service) *RegisterController {
 	}
 }
 
-func (ctrl *RegisterController) GetResponse(ctx *gin.Context) {
+func (c *RegisterController) GetResponse(ctx *gin.Context) {
 	var request service.CreateUserRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		controller.SendResponse(ctx, false, "Invalid request format", nil, customerrors.ErrBadRequest)
 		return
 	}
 
-	user, err := ctrl.service.CreateUser(&request)
+	user, err := c.service.CreateUser(&request)
 	if err != nil {
 		controller.SendResponse(ctx, false, "", nil, err)
 		return
