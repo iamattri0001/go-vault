@@ -27,12 +27,21 @@ func ensureIndexes(db *mongo.Client, dbName string) {
 		log.Fatal("Could not create user index:", err)
 	}
 
-	// Collection: index on user_id
+	// Vault: index on user_id
 	_, err = vaultCol.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: bson.D{{Key: "user_id", Value: 1}},
 	})
 	if err != nil {
 		log.Fatal("Could not create collection index:", err)
+	}
+
+	// Vault: compound index on user_id and title
+	_, err = vaultCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+		Keys:    bson.D{{Key: "user_id", Value: 1}, {Key: "title", Value: 1}},
+		Options: options.Index().SetUnique(true),
+	})
+	if err != nil {
+		log.Fatal("Could not create compound index on user_id and title:", err)
 	}
 
 	// Password: index on collection_id

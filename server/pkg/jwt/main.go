@@ -3,22 +3,26 @@ package jwt
 import (
 	"fmt"
 	customerrors "go-vault/custom_errors"
+	"go-vault/database/models"
 	"log"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
+	"github.com/google/uuid"
 )
 
 var jwtSecret = []byte("your_secret_key")
 
 type Claims struct {
-	Username string `json:"username"`
+	Username string    `json:"username"`
+	ID       uuid.UUID `json:"id"`
 	jwt.StandardClaims
 }
 
-func GenerateToken(username string, expirationInHours int) (string, error) {
+func GenerateToken(user *models.User, expirationInHours int) (string, error) {
 	claims := Claims{
-		Username: username,
+		Username: user.Username,
+		ID:       user.ID,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: time.Now().Add(time.Duration(expirationInHours) * time.Hour).Unix(),
 		},

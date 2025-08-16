@@ -12,4 +12,5 @@ type VaultRepository interface {
 	DeleteByID(id uuid.UUID) error
 	GetByID(id uuid.UUID) (*models.Vault, error)
 	GetByUserID(userID uuid.UUID) ([]*models.Vault, error)
+	ExistsByUserIdAndTitle(userID uuid.UUID, title string) bool
 }

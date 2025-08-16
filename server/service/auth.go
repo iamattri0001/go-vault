@@ -3,7 +3,6 @@ package service
 import (
 	customerrors "go-vault/custom_errors"
 	"go-vault/database/models"
-	"go-vault/pkg/hash"
 	"log"
 
 	"github.com/go-playground/validator/v10"
@@ -14,13 +13,13 @@ func (s *Service) CreateUser(request *CreateUserRequest) (*models.User, error) {
 		return nil, customerrors.ErrBadRequest
 	}
 
-	if s.userRepository.ExistsByUsername(request.Username) {
-		return nil, customerrors.ErrUsernameTaken
-	}
-
 	user, err := toUserModel(request)
 	if err != nil {
 		return nil, err
+	}
+
+	if s.userRepository.ExistsByUsername(request.Username) {
+		return nil, customerrors.ErrUsernameTaken
 	}
 
 	err = s.userRepository.Create(user)
@@ -39,11 +38,6 @@ func (s *Service) LoginUser(request *LoginUserRequest) (*models.User, error) {
 	user, err := s.userRepository.GetByUsername(request.Username)
 	if err != nil {
 		return nil, customerrors.ErrUserNotFound
-	}
-
-	if err := hash.CheckHash(request.Password, user.MasterPasswordHash); err != nil {
-		log.Printf("Login failed for user %s: %v", request.Username, err)
-		return nil, customerrors.ErrInvalidCredentials
 	}
 
 	return user, nil

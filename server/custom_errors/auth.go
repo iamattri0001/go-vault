@@ -8,4 +8,5 @@ var (
 	ErrUsernameTaken         = errors.New("username is already taken")
 	ErrUserNotFound          = errors.New("user not found")
 	ErrInvalidCredentials    = errors.New("invalid credentials")
+	ErrUnauthorized          = errors.New("unauthorized")
 )

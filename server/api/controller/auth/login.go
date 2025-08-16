@@ -3,8 +3,10 @@ package auth
 import (
 	"go-vault/api/controller"
 	customerrors "go-vault/custom_errors"
+	"go-vault/pkg/hash"
 	"go-vault/pkg/jwt"
 	"go-vault/service"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,7 +34,13 @@ func (c *LoginController) GetResponse(ctx *gin.Context) {
 		return
 	}
 
-	token, err := jwt.GenerateToken(user.Username, 24)
+	if err := hash.CheckHash(request.Password, user.MasterPasswordHash); err != nil {
+		log.Printf("Login failed for user %s: %v", request.Username, err)
+		controller.SendResponse(ctx, false, "Invalid username or password", nil, customerrors.ErrInvalidCredentials)
+		return
+	}
+
+	token, err := jwt.GenerateToken(user, 24)
 	if err != nil {
 		controller.SendResponse(ctx, false, "", nil, err)
 		return

@@ -3,7 +3,7 @@ package models
 import "github.com/google/uuid"
 
 type Password struct {
-	Base
+	Base              `bson:",inline"`
 	VaultID           uuid.UUID `json:"vault_id" bson:"vault_id"`
 	Title             string    `json:"title" bson:"title"`
 	Description       string    `json:"description" bson:"description"`

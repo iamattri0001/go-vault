@@ -24,7 +24,7 @@ func (r *VaultRepositoryImpl) Create(vault *models.Vault) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.VaultCollection)
-	_, err := collection.InsertOne(ctx, collection)
+	_, err := collection.InsertOne(ctx, vault)
 	return err
 }
 
@@ -74,4 +74,13 @@ func (r *VaultRepositoryImpl) GetByUserID(userID uuid.UUID) ([]*models.Vault, er
 		vaults = append(vaults, &vault)
 	}
 	return vaults, nil
+}
+
+func (r *VaultRepositoryImpl) ExistsByUserIdAndTitle(userID uuid.UUID, title string) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
+	defer cancel()
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.VaultCollection)
+	var vault models.Vault
+	err := collection.FindOne(ctx, bson.M{"user_id": userID, "title": title}).Decode(&vault)
+	return err == nil && vault.ID != uuid.Nil
 }
