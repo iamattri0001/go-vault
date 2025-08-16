@@ -42,7 +42,7 @@ func NewApp() (*App, error) {
 func (a *App) Run() {
 	port := a.Config.ServiceConfig.Port
 	address := fmt.Sprintf(":%d", port)
-	router.SetupRoutes(a.GinEngine)
+	router.SetupRoutes(a.GinEngine, a.Injector.Service)
 	if err := a.GinEngine.Run(address); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}

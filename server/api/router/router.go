@@ -1,10 +1,25 @@
 package router
 
-import "github.com/gin-gonic/gin"
+import (
+	"go-vault/service"
 
-func SetupRoutes(r *gin.Engine) {
+	"go-vault/api/controller/auth"
+
+	"github.com/gin-gonic/gin"
+)
+
+func SetupRoutes(r *gin.Engine, service *service.Service) {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
-	// Add more routes here
+
+	addUserRoutes(r, service)
+
+}
+
+func addUserRoutes(r *gin.Engine, service *service.Service) {
+	authGrp := r.Group("/api/v1/auth")
+	{
+		authGrp.POST("/register", auth.NewRegisterController(service).GetResponse)
+	}
 }

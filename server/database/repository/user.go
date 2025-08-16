@@ -12,4 +12,5 @@ type UserRepository interface {
 	DeleteByID(id uuid.UUID) error
 	GetByID(id uuid.UUID) (*models.User, error)
 	GetByUsername(username string) (*models.User, error)
+	ExistsByUsername(username string) bool
 }

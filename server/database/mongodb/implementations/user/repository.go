@@ -67,3 +67,12 @@ func (r *UserRepositoryImpl) GetByUsername(username string) (*models.User, error
 	}
 	return &user, nil
 }
+
+func (r *UserRepositoryImpl) ExistsByUsername(username string) bool {
+	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
+	defer cancel()
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
+	var user models.User
+	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+	return err == nil && user.ID != uuid.Nil
+}
