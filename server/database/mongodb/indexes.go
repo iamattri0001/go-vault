@@ -14,9 +14,9 @@ func ensureIndexes(db *mongo.Client, dbName string) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	userCol := db.Database(dbName).Collection(UserCol)
-	collectionCol := db.Database(dbName).Collection(CollectionCol)
-	passwordCol := db.Database(dbName).Collection(PasswordCol)
+	userCol := db.Database(dbName).Collection(UserCollection)
+	vaultCol := db.Database(dbName).Collection(VaultCollection)
+	passwordCol := db.Database(dbName).Collection(PasswordCollection)
 
 	// User: unique username
 	_, err := userCol.Indexes().CreateOne(ctx, mongo.IndexModel{
@@ -28,7 +28,7 @@ func ensureIndexes(db *mongo.Client, dbName string) {
 	}
 
 	// Collection: index on user_id
-	_, err = collectionCol.Indexes().CreateOne(ctx, mongo.IndexModel{
+	_, err = vaultCol.Indexes().CreateOne(ctx, mongo.IndexModel{
 		Keys: bson.D{{Key: "user_id", Value: 1}},
 	})
 	if err != nil {

@@ -3,15 +3,15 @@ package service
 import "go-vault/database/repository"
 
 type Service struct {
-	UserRepository       repository.UserRepository
-	PasswordRepository   repository.PasswordRepository
-	CollectionRepository repository.CollectionRepository
+	UserRepository     repository.UserRepository
+	PasswordRepository repository.PasswordRepository
+	VaultRepository    repository.VaultRepository
 }
 
-func NewService(userRepo repository.UserRepository, collectionRepo repository.CollectionRepository, passwordRepo repository.PasswordRepository) *Service {
+func NewService(userRepo repository.UserRepository, vaultRepo repository.VaultRepository, passwordRepo repository.PasswordRepository) *Service {
 	return &Service{
-		UserRepository:       userRepo,
-		PasswordRepository:   passwordRepo,
-		CollectionRepository: collectionRepo,
+		UserRepository:     userRepo,
+		PasswordRepository: passwordRepo,
+		VaultRepository:    vaultRepo,
 	}
 }

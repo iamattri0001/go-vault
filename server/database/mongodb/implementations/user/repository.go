@@ -23,7 +23,7 @@ func NewUserRepositoryImpl(client *mongodb.MongoDBConnection) repository.UserRep
 func (r *UserRepositoryImpl) Create(user *models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
-	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCol)
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
 	_, err := collection.InsertOne(ctx, user)
 	return err
 }
@@ -31,7 +31,7 @@ func (r *UserRepositoryImpl) Create(user *models.User) error {
 func (r *UserRepositoryImpl) Update(user *models.User) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
-	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCol)
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
 	_, err := collection.UpdateOne(ctx, bson.M{"_id": user.ID}, bson.M{"$set": user})
 	return err
 }
@@ -39,7 +39,7 @@ func (r *UserRepositoryImpl) Update(user *models.User) error {
 func (r *UserRepositoryImpl) DeleteByID(id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
-	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCol)
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
 	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"deleted": true}})
 	return err
 }
@@ -47,7 +47,7 @@ func (r *UserRepositoryImpl) DeleteByID(id uuid.UUID) error {
 func (r *UserRepositoryImpl) GetByID(id uuid.UUID) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
-	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCol)
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
 	var user models.User
 	err := collection.FindOne(ctx, bson.M{"_id": id}).Decode(&user)
 	if err != nil {
@@ -59,7 +59,7 @@ func (r *UserRepositoryImpl) GetByID(id uuid.UUID) (*models.User, error) {
 func (r *UserRepositoryImpl) GetByUsername(username string) (*models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
-	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCol)
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
 	var user models.User
 	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
 	if err != nil {

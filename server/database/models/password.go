@@ -4,7 +4,7 @@ import "github.com/google/uuid"
 
 type Password struct {
 	Base
-	CollectionID      uuid.UUID `json:"collection_id" bson:"collection_id"`
+	VaultID           uuid.UUID `json:"vault_id" bson:"vault_id"`
 	Title             string    `json:"title" bson:"title"`
 	Description       string    `json:"description" bson:"description"`
 	Username          string    `json:"username" bson:"username"`

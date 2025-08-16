@@ -1,7 +1,7 @@
 package mongodb
 
 const (
-	UserCol       = "users"
-	PasswordCol   = "passwords"
-	CollectionCol = "collections"
+	UserCollection     = "users"
+	PasswordCollection = "passwords"
+	VaultCollection    = "vaults"
 )
