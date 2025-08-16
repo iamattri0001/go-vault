@@ -9,7 +9,7 @@ func LoadConfig() (*Config, error) {
 	env := os.Getenv("ENV")
 	var configJSON string
 	if env != "PROD" {
-		data, _ := os.ReadFile("config.example.json")
+		data, _ := os.ReadFile("config.json")
 		configJSON = string(data)
 	} else {
 		configJSON = os.Getenv("CONFIG_JSON")
