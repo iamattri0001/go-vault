@@ -9,6 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type UserRepositoryImpl struct {
@@ -76,4 +77,16 @@ func (r *UserRepositoryImpl) ExistsByUsername(username string) bool {
 	var user models.User
 	err := collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
 	return err == nil && user.ID != uuid.Nil
+}
+
+func (r *UserRepositoryImpl) GetSaltsByUsername(username string) (*models.User, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
+	defer cancel()
+	collection := r.mongoDB.GetDatabase().Collection(mongodb.UserCollection)
+	var user models.User
+	err := collection.FindOne(ctx, bson.M{"username": username, "deleted_at": nil}, options.FindOne().SetProjection(bson.M{"auth_salt": 1, "encryption_salt": 1})).Decode(&user)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }
