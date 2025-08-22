@@ -3,6 +3,7 @@ package service
 import (
 	customerrors "go-vault/custom_errors"
 	"go-vault/database/models"
+	"go-vault/utils/dbutils"
 	"log"
 
 	"github.com/go-playground/validator/v10"
@@ -82,4 +83,30 @@ func (s *Service) UpdateVault(userID, vaultID uuid.UUID, request *UpdateVaultReq
 	}
 
 	return vault, nil
+}
+
+func (s *Service) DeleteVaultAndPasswordByVaultID(userID, vaultID uuid.UUID) error {
+	vault, err := s.vaultRepository.GetByID(vaultID)
+	if err != nil {
+		return customerrors.ErrVaultNotFound
+	}
+
+	if vault.UserID != userID {
+		return customerrors.ErrUnauthorized
+	}
+
+	err = dbutils.RunParallel(
+		func() error {
+			return s.vaultRepository.DeleteByID(vaultID)
+		},
+		func() error {
+			return s.passwordRepository.DeleteByVaultID(vaultID)
+		},
+	)
+
+	if err != nil {
+		log.Printf("Error deleting vault and passwords: %v", err)
+		return customerrors.ErrSomethingWentWrong
+	}
+	return nil
 }

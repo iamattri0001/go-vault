@@ -13,4 +13,5 @@ type UserRepository interface {
 	GetByID(id uuid.UUID) (*models.User, error)
 	GetByUsername(username string) (*models.User, error)
 	ExistsByUsername(username string) bool
+	GetSaltsByUsername(username string) (*models.User, error)
 }

@@ -5,6 +5,8 @@ import (
 
 	"go-vault/api/controller"
 	"go-vault/api/controller/auth"
+	"go-vault/api/controller/general"
+	"go-vault/api/controller/password"
 	"go-vault/api/controller/vault"
 	"go-vault/api/middleware"
 
@@ -18,9 +20,13 @@ func SetupRoutes(r *gin.Engine, service *service.Service) {
 
 	addUserRoutes(r, service)
 	addVaultRoutes(r, service)
+	addPasswordRoutes(r, service)
 }
 
 func addUserRoutes(r *gin.Engine, service *service.Service) {
+	// general routes which don't require authentication
+	r.GET("/api/v1/salts/:username", general.NewGetSaltsController(service).GetResponse)
+
 	authGrp := r.Group("/api/v1/auth")
 	{
 		authGrp.POST("/register", auth.NewRegisterController(service).GetResponse)
@@ -37,8 +43,18 @@ func addVaultRoutes(r *gin.Engine, service *service.Service) {
 	{
 		vaultGrp.POST("/create", vault.NewCreateVaultController(service).GetResponse)
 		vaultGrp.GET("/list", vault.NewListVaultsController(service).GetResponse)
-		vaultGrp.POST("/:id", vault.NewUpdateVaultController(service).GetResponse)
-		// vaultGrp.GET("/:id", auth.NewGetVaultController(service).GetResponse)
-		// vaultGrp.DELETE("/:id", auth.NewDeleteVaultController(service).GetResponse)
+		vaultGrp.PUT("/:id", vault.NewUpdateVaultController(service).GetResponse)
+		vaultGrp.GET("/:id", vault.NewGetVaultController(service).GetResponse)
+		vaultGrp.DELETE("/:id", vault.NewDeleteVaultController(service).GetResponse)
+	}
+}
+
+func addPasswordRoutes(r *gin.Engine, service *service.Service) {
+	passwordGrp := r.Group("/api/v1/password").Use(middleware.AuthMiddleware())
+	{
+		passwordGrp.POST("/create", password.NewCreatePasswordController(service).GetResponse)
+		// passwordGrp.GET("/list", password.NewListPasswordsController(service).GetResponse)
+		// passwordGrp.PUT("/:id", password.NewUpdatePasswordController(service).GetResponse)
+		// passwordGrp.DELETE("/:id", password.NewDeletePasswordController(service).GetResponse)
 	}
 }

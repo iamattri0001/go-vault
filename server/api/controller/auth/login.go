@@ -34,7 +34,7 @@ func (c *LoginController) GetResponse(ctx *gin.Context) {
 		return
 	}
 
-	if err := hash.CheckHash(request.Password, user.MasterPasswordHash); err != nil {
+	if err := hash.CheckHash(request.Password, user.PasswordHash); err != nil {
 		log.Printf("Login failed for user %s: %v", request.Username, err)
 		controller.SendResponse(ctx, false, "Invalid username or password", nil, customerrors.ErrInvalidCredentials)
 		return
