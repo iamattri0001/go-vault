@@ -41,7 +41,7 @@ export function Login({ setAuthType }) {
     const response = await LoginUser(username, password);
     if (response.success) {
       toast.success("Login successful!");
-      login(response.data.user);
+      login(response.data.user, password);
     } else {
       if (response.error !== "") {
         toast.error(CapitalizeFirstLetter(response.error));

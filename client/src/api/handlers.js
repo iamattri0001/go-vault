@@ -1,5 +1,6 @@
-import { DeriveKey, GenerateSalt } from "@/utils/encryption";
+import { DeriveKey, EncryptString, GenerateSalt } from "@/utils/encryption";
 import { MakeApiCall } from "./call";
+import { use } from "react";
 
 export const RegisterUser = async (username, password) => {
   const authSalt = GenerateSalt();
@@ -29,6 +30,9 @@ export const LoginUser = async (username, password) => {
 };
 
 export const GetSalts = async (username) => {
+  if (!username) {
+    username = (await GetUsername()) || "";
+  }
   if (localStorage.getItem("salts_" + username)) {
     return JSON.parse(localStorage.getItem("salts_" + username));
   }
@@ -43,6 +47,11 @@ export const GetSalts = async (username) => {
   return null;
 };
 
+export const GetUsername = async () => {
+  const user = await JSON.parse(localStorage.getItem("user"));
+  return user?.username;
+};
+
 export const LogoutUser = async () => {
   return await MakeApiCall("/v1/auth/logout", "GET", {});
 };
@@ -55,5 +64,51 @@ export const CreateVault = async (title, description) => {
   return await MakeApiCall("/v1/vault/create", "POST", {
     title,
     description,
+  });
+};
+
+export const GetPasswordsList = async (vault_id) => {
+  return await MakeApiCall("v1/vault/" + vault_id, "GET", {});
+};
+
+export const CreatePassword = async ({
+  title,
+  description,
+  username,
+  password,
+  website,
+  vault_id,
+}) => {
+  const salts = await GetSalts();
+  if (salts === null) {
+    return { success: false, error: "Failed to retrieve salts" };
+  }
+
+  console.log(salts);
+
+  if (!salts.encryption_salt) {
+    return { success: false, error: "Missing encryption salt" };
+  }
+
+  const encryptionKey = localStorage.getItem(
+    (await GetUsername()) + "_encryption_key"
+  );
+
+  if (!encryptionKey) {
+    return {
+      success: false,
+      error: "Missing encryption key in localStorage. Please re-login.",
+    };
+  }
+
+  const encrypted_password = await EncryptString(password, encryptionKey);
+
+  return await MakeApiCall("/v1/password/create", "POST", {
+    title,
+    description,
+    username,
+    password: encrypted_password,
+    website,
+    vault_id,
   });
 };

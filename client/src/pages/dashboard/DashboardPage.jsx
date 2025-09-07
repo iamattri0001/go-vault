@@ -1,6 +1,5 @@
-import { Section } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import Navbar from "./components/Navbar";
+import Navbar from "../common/Navbar";
 import VaultsList from "./components/VaultsList";
 import { AddNewVault } from "./components/AddNewVault";
 import { GetVaultsList } from "@/api/handlers";
@@ -9,7 +8,6 @@ import { CapitalizeFirstLetter } from "@/utils/text";
 
 const DashboardPage = () => {
   const [vaults, setVaults] = useState([]);
-  console.log(vaults);
   useEffect(() => {
     const fetchVaults = async () => {
       const response = await GetVaultsList();

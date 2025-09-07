@@ -52,12 +52,24 @@ export function AddNewVault({ setVaults }) {
           <Input
             placeholder="Vault name (e.g. Work, Personal, Banking)"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 30) {
+                setTitle(e.target.value);
+              } else {
+                toast.error("Name cannot exceed 30 characters.");
+              }
+            }}
           />
           <Textarea
             placeholder="Description (optional)"
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => {
+              if (e.target.value.length <= 100) {
+                setDescription(e.target.value);
+              } else {
+                toast.error("Description cannot exceed 100 characters.");
+              }
+            }}
           />
         </div>
         <AlertDialogFooter>
