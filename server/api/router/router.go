@@ -1,6 +1,7 @@
 package router
 
 import (
+	"go-vault/injector"
 	"go-vault/service"
 	"time"
 
@@ -15,22 +16,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(r *gin.Engine, service *service.Service) {
+func SetupRoutes(r *gin.Engine, di *injector.DependencyInjector) {
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173"}, // your React dev server
+		AllowOrigins:     di.AppConfig.ServiceConfig.Clients,
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},
-		AllowCredentials: true, // <- this is the key when using cookies/tokens in headers
+		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
 
-	addUserRoutes(r, service)
-	addVaultRoutes(r, service)
-	addPasswordRoutes(r, service)
+	addUserRoutes(r, di.Service)
+	addVaultRoutes(r, di.Service)
+	addPasswordRoutes(r, di.Service)
 }
 
 func addUserRoutes(r *gin.Engine, service *service.Service) {

@@ -29,7 +29,7 @@ func NewApp() (*App, error) {
 		log.Fatalf("Failed to connect to MongoDB: %v", err)
 	}
 
-	di := injector.NewDependencyInjector(injector.WithMongoDB(mongoDbConnection))
+	di := injector.NewDependencyInjector(injector.WithAppConfig(config), injector.WithMongoDB(mongoDbConnection))
 
 	return &App{
 		Config:    config,
@@ -43,7 +43,7 @@ func (a *App) Run() {
 	defer a.Close()
 	port := a.Config.ServiceConfig.Port
 	address := fmt.Sprintf(":%d", port)
-	router.SetupRoutes(a.GinEngine, a.Injector.Service)
+	router.SetupRoutes(a.GinEngine, a.Injector)
 	if err := a.GinEngine.Run(address); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}

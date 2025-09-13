@@ -6,8 +6,9 @@ type Config struct {
 }
 
 type ServiceConfig struct {
-	Name string `json:"name"`
-	Port int    `json:"port"`
+	Name    string   `json:"name"`
+	Port    int      `json:"port"`
+	Clients []string `json:"clients"`
 }
 
 type MongoConfig struct {

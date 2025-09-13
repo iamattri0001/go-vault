@@ -1,6 +1,7 @@
 package injector
 
 import (
+	"go-vault/config"
 	"go-vault/database/mongodb"
 	"go-vault/database/mongodb/implementations/password"
 	"go-vault/database/mongodb/implementations/user"
@@ -17,5 +18,11 @@ func WithMongoDB(mongoDB *mongodb.MongoDBConnection) func(di *DependencyInjector
 		service := service.NewService(userRepo, vaultRepo, passwordRepo)
 
 		di.Service = service
+	}
+}
+
+func WithAppConfig(config *config.Config) func(di *DependencyInjector) {
+	return func(di *DependencyInjector) {
+		di.AppConfig = config
 	}
 }

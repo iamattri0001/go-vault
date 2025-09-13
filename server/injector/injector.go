@@ -1,9 +1,13 @@
 package injector
 
-import "go-vault/service"
+import (
+	"go-vault/config"
+	"go-vault/service"
+)
 
 type DependencyInjector struct {
-	Service *service.Service
+	Service   *service.Service
+	AppConfig *config.Config
 }
 
 var SingletonInjector *DependencyInjector
