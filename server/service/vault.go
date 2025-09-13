@@ -35,6 +35,28 @@ func (s *Service) CreateVault(userID uuid.UUID, request *CreateVaultRequest) (*m
 	return vault, nil
 }
 
+func (s *Service) GetVaultByID(userID, vaultID uuid.UUID) (*models.Vault, error) {
+	if userID == uuid.Nil {
+		return nil, customerrors.ErrUserNotFound
+	}
+
+	if vaultID == uuid.Nil {
+		return nil, customerrors.ErrVaultNotFound
+	}
+
+	vault, err := s.vaultRepository.GetByID(vaultID)
+	if err != nil {
+		log.Printf("Error fetching vault by ID %s: %v", vaultID, err)
+		return nil, customerrors.ErrSomethingWentWrong
+	}
+
+	if vault.UserID != userID {
+		return nil, customerrors.ErrUnauthorized
+	}
+
+	return vault, nil
+}
+
 func (s *Service) ListVaults(userID uuid.UUID) ([]*models.Vault, error) {
 	if userID == uuid.Nil {
 		return nil, customerrors.ErrUserNotFound
@@ -46,7 +68,7 @@ func (s *Service) ListVaults(userID uuid.UUID) ([]*models.Vault, error) {
 	return vaults, nil
 }
 
-func (s *Service) UpdateVault(userID, vaultID uuid.UUID, request *UpdateVaultRequest) (*models.Vault, error) {
+func (s *Service) UpdateVault(userID uuid.UUID, request *UpdateVaultRequest) (*models.Vault, error) {
 	if err := validator.New().Struct(request); err != nil {
 		return nil, customerrors.ErrBadRequest
 	}
@@ -55,14 +77,18 @@ func (s *Service) UpdateVault(userID, vaultID uuid.UUID, request *UpdateVaultReq
 		return nil, customerrors.ErrUserNotFound
 	}
 
-	if vaultID == uuid.Nil {
+	if request.ID == uuid.Nil {
 		return nil, customerrors.ErrVaultNotFound
 	}
 
-	vault, err := s.vaultRepository.GetByID(vaultID)
+	vault, err := s.vaultRepository.GetByID(request.ID)
 	if err != nil {
 		log.Printf("Error fetching vault: %v", err)
 		return nil, customerrors.ErrVaultNotFound
+	}
+
+	if vault.UserID != userID {
+		return nil, customerrors.ErrUnauthorized
 	}
 
 	if s.vaultRepository.ExistsByUserIdAndTitle(userID, request.Title) && vault.Title != request.Title {
@@ -73,7 +99,7 @@ func (s *Service) UpdateVault(userID, vaultID uuid.UUID, request *UpdateVaultReq
 		return nil, customerrors.ErrUnauthorized
 	}
 
-	vault, err = toUpdatedVaultModel(vaultID, userID, request)
+	vault, err = toUpdatedVaultModel(userID, request)
 	if err != nil {
 		return nil, err
 	}

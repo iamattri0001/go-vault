@@ -1,4 +1,4 @@
-package vault
+package password
 
 import (
 	"go-vault/api/controller"
@@ -9,18 +9,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type UpdateVaultController struct {
+type UpdatePasswordController struct {
 	service *service.Service
 }
 
-func NewUpdateVaultController(service *service.Service) *UpdateVaultController {
-	return &UpdateVaultController{
+func NewUpdatePasswordController(service *service.Service) *UpdatePasswordController {
+	return &UpdatePasswordController{
 		service: service,
 	}
 }
 
-func (c *UpdateVaultController) GetResponse(ctx *gin.Context) {
-	var request service.UpdateVaultRequest
+func (c *UpdatePasswordController) GetResponse(ctx *gin.Context) {
+	var request *service.UpdatePasswordRequest
 	if err := ctx.ShouldBindJSON(&request); err != nil {
 		controller.SendResponse(ctx, false, "Invalid request format", nil, customerrors.ErrBadRequest)
 		return
@@ -32,11 +32,11 @@ func (c *UpdateVaultController) GetResponse(ctx *gin.Context) {
 		return
 	}
 
-	vault, err := c.service.UpdateVault(userID, &request)
+	password, err := c.service.UpdatePassword(userID, request)
 	if err != nil {
 		controller.SendResponse(ctx, false, "", nil, err)
 		return
 	}
 
-	controller.SendResponse(ctx, true, "Vault updated successfully", map[string]any{"vault": vault}, nil)
+	controller.SendResponse(ctx, true, "Password created successfully", map[string]any{"password": password}, nil)
 }

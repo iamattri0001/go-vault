@@ -3,7 +3,6 @@ package customerrors
 var ErrMap = map[error]int{
 	ErrSomethingWentWrong:         500,
 	ErrBadRequest:                 400,
-	ErrInvalidPasswordFormat:      400,
 	ErrInvalidUsernameFormat:      400,
 	ErrUsernameTaken:              400,
 	ErrUserNotFound:               404,
@@ -13,6 +12,8 @@ var ErrMap = map[error]int{
 	ErrPasswordNotFound:           404,
 	ErrPasswordAlreadyExists:      409,
 	ErrInvalidPasswordTitleFormat: 400,
+	ErrVaultAlreadyExists:         409,
+	ErrInvalidTitleFormat:         400,
 }
 
 func GetCode(err error) int {

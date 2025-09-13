@@ -29,13 +29,21 @@ func (s *Service) GetVaultPasswords(userID uuid.UUID, vaultID uuid.UUID) ([]*mod
 }
 
 func (s *Service) CreatePasswordWithVaultID(userID uuid.UUID, request *CreatePasswordRequest) (*models.Password, error) {
-	vaultID := request.VaultID
 	if userID == uuid.Nil {
 		return nil, customerrors.ErrUserNotFound
 	}
 
+	vaultID := request.VaultID
 	if vaultID == uuid.Nil {
 		return nil, customerrors.ErrVaultNotFound
+	}
+
+	vault, err := s.vaultRepository.GetByID(vaultID)
+	if err != nil {
+		return nil, customerrors.ErrSomethingWentWrong
+	}
+	if vault.UserID != userID {
+		return nil, customerrors.ErrUnauthorized
 	}
 
 	password, err := toPasswordModel(userID, vaultID, request)
@@ -53,4 +61,43 @@ func (s *Service) CreatePasswordWithVaultID(userID uuid.UUID, request *CreatePas
 	}
 
 	return password, nil
+}
+
+func (s *Service) UpdatePassword(userID uuid.UUID, request *UpdatePasswordRequest) (*models.Password, error) {
+	if userID == uuid.Nil {
+		return nil, customerrors.ErrUserNotFound
+	}
+	vaultID := request.VaultID
+	if vaultID == uuid.Nil {
+		return nil, customerrors.ErrVaultNotFound
+	}
+
+	vault, err := s.vaultRepository.GetByID(vaultID)
+	if err != nil {
+		return nil, customerrors.ErrSomethingWentWrong
+	}
+
+	if vault.UserID != userID {
+		return nil, customerrors.ErrUnauthorized
+	}
+	password, err := s.passwordRepository.GetByID(request.ID)
+	if err != nil {
+		return nil, customerrors.ErrSomethingWentWrong
+	}
+
+	if password.UserID != userID {
+		return nil, customerrors.ErrUnauthorized
+	}
+
+	updatedPassword, err := toUpdatedPasswordModel(userID, vaultID, request)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.passwordRepository.Update(updatedPassword); err != nil {
+		log.Printf("Error updating password: %v", err)
+		return nil, customerrors.ErrSomethingWentWrong
+	}
+
+	return updatedPassword, nil
 }

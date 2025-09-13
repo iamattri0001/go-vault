@@ -2,6 +2,7 @@ package router
 
 import (
 	"go-vault/service"
+	"time"
 
 	"go-vault/api/controller"
 	"go-vault/api/controller/auth"
@@ -10,10 +11,19 @@ import (
 	"go-vault/api/controller/vault"
 	"go-vault/api/middleware"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 func SetupRoutes(r *gin.Engine, service *service.Service) {
+	r.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // your React dev server
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true, // <- this is the key when using cookies/tokens in headers
+		MaxAge:           12 * time.Hour,
+	}))
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{"message": "pong"})
 	})
@@ -41,9 +51,9 @@ func addUserRoutes(r *gin.Engine, service *service.Service) {
 func addVaultRoutes(r *gin.Engine, service *service.Service) {
 	vaultGrp := r.Group("/api/v1/vault").Use(middleware.AuthMiddleware())
 	{
-		vaultGrp.POST("/create", vault.NewCreateVaultController(service).GetResponse)
+		vaultGrp.POST("/", vault.NewCreateVaultController(service).GetResponse)
 		vaultGrp.GET("/list", vault.NewListVaultsController(service).GetResponse)
-		vaultGrp.PUT("/:id", vault.NewUpdateVaultController(service).GetResponse)
+		vaultGrp.PUT("/", vault.NewUpdateVaultController(service).GetResponse)
 		vaultGrp.GET("/:id", vault.NewGetVaultController(service).GetResponse)
 		vaultGrp.DELETE("/:id", vault.NewDeleteVaultController(service).GetResponse)
 	}
@@ -52,9 +62,8 @@ func addVaultRoutes(r *gin.Engine, service *service.Service) {
 func addPasswordRoutes(r *gin.Engine, service *service.Service) {
 	passwordGrp := r.Group("/api/v1/password").Use(middleware.AuthMiddleware())
 	{
-		passwordGrp.POST("/create", password.NewCreatePasswordController(service).GetResponse)
-		// passwordGrp.GET("/list", password.NewListPasswordsController(service).GetResponse)
-		// passwordGrp.PUT("/:id", password.NewUpdatePasswordController(service).GetResponse)
+		passwordGrp.POST("/", password.NewCreatePasswordController(service).GetResponse)
+		passwordGrp.PUT("/", password.NewUpdatePasswordController(service).GetResponse)
 		// passwordGrp.DELETE("/:id", password.NewDeletePasswordController(service).GetResponse)
 	}
 }

@@ -8,7 +8,7 @@ import (
 
 type Base struct {
 	ID        uuid.UUID  `json:"id" bson:"_id"`
-	CreatedAt time.Time  `json:"-" bson:"created_at"`
-	UpdatedAt time.Time  `json:"-" bson:"updated_at"`
+	CreatedAt time.Time  `json:"created_at" bson:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at" bson:"updated_at"`
 	DeletedAt *time.Time `json:"-" bson:"deleted_at,omitempty"`
 }

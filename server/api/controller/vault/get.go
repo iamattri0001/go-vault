@@ -37,5 +37,5 @@ func (c *GetVaultController) GetResponse(ctx *gin.Context) {
 		controller.SendResponse(ctx, false, "", nil, err)
 		return
 	}
-	controller.SendResponse(ctx, true, "Vault passwords retrieved successfully", map[string]any{"vault_passwords": vaultPasswords}, nil)
+	controller.SendResponse(ctx, true, "Vault passwords retrieved successfully", map[string]any{"passwords": vaultPasswords}, nil)
 }
