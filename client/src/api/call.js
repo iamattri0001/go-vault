@@ -1,7 +1,12 @@
 import api from "./axios";
 export const MakeApiCall = async (url, method, data) => {
   try {
-    const response = await api.request({ url, method, data });
+    const response = await api.request({
+      url,
+      method,
+      data,
+      withCredentials: true,
+    });
     return handleAxiosResponse(response);
   } catch (error) {
     return {

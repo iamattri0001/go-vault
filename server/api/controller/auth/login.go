@@ -7,6 +7,7 @@ import (
 	"go-vault/pkg/jwt"
 	"go-vault/service"
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -45,6 +46,15 @@ func (c *LoginController) GetResponse(ctx *gin.Context) {
 		controller.SendResponse(ctx, false, "", nil, err)
 		return
 	}
-	ctx.SetCookie("token", token, 3600, "/", "", true, true)
+	cookie := &http.Cookie{
+		Name:     "token",
+		Value:    token,
+		Path:     "/",
+		MaxAge:   3600,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	http.SetCookie(ctx.Writer, cookie)
 	controller.SendResponse(ctx, true, "User logged in successfully", map[string]any{"user": user}, nil)
 }
