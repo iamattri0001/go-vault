@@ -45,6 +45,6 @@ func (c *LoginController) GetResponse(ctx *gin.Context) {
 		controller.SendResponse(ctx, false, "", nil, err)
 		return
 	}
-	ctx.SetCookie("token", token, 3600, "/", "", false, true)
+	ctx.SetCookie("token", token, 3600, "/", "", true, true)
 	controller.SendResponse(ctx, true, "User logged in successfully", map[string]any{"user": user}, nil)
 }
