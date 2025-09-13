@@ -1,5 +1,5 @@
 import React from "react";
-import { Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import AuthPage from "./pages/auth/AuthPage";
 import DashboardPage from "./pages/dashboard/DashboardPage";
@@ -10,6 +10,8 @@ const App = () => {
   return (
     <Routes>
       <Route path="/auth" element={<AuthPage />} />
+
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       <Route
         path="/dashboard"

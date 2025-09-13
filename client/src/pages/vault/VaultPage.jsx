@@ -6,6 +6,7 @@ import { CapitalizeFirstLetter } from "@/utils/text";
 import { AddNewPassword } from "./components/AddNewPassword";
 import PasswordsList from "./components/PasswordsList";
 import { useParams } from "react-router-dom";
+import { IoMdArrowBack } from "react-icons/io";
 
 const VaultPage = () => {
   const { vault_id } = useParams();
@@ -26,11 +27,22 @@ const VaultPage = () => {
     fetchPasswords();
   }, []);
 
+  const goBack = () => {
+    window.history.back();
+  };
+
   return (
-    <section className="px-4 py-2">
+    <section className="px-6 py-2">
       <Navbar />
       <div className="mt-4 min-h-[80vh] flex flex-col">
-        <div className="flex items-end justify-end">
+        <div className="flex items-end justify-between">
+          <div
+            className="text-sm text-foreground/65 cursor-pointer"
+            onClick={goBack}
+          >
+            <IoMdArrowBack className="inline mr-1 mb-1" />
+            <span className="underline">Back to Dashboard</span>
+          </div>
           <AddNewPassword setPasswords={setPasswords} vault_id={vault_id} />
         </div>
         <PasswordsList

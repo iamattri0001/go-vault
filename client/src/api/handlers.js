@@ -1,6 +1,5 @@
 import { DeriveKey, EncryptString, GenerateSalt } from "@/utils/encryption";
 import { MakeApiCall } from "./call";
-import { use } from "react";
 
 export const RegisterUser = async (username, password) => {
   const authSalt = GenerateSalt();
@@ -61,7 +60,7 @@ export const GetVaultsList = async () => {
 };
 
 export const CreateVault = async (title, description) => {
-  return await MakeApiCall("/v1/vault/create", "POST", {
+  return await MakeApiCall("/v1/vault/", "POST", {
     title,
     description,
   });
@@ -78,37 +77,38 @@ export const CreatePassword = async ({
   password,
   website,
   vault_id,
+  encryptionKey,
 }) => {
-  const salts = await GetSalts();
-  if (salts === null) {
-    return { success: false, error: "Failed to retrieve salts" };
-  }
-
-  console.log(salts);
-
-  if (!salts.encryption_salt) {
-    return { success: false, error: "Missing encryption salt" };
-  }
-
-  const encryptionKey = localStorage.getItem(
-    (await GetUsername()) + "_encryption_key"
-  );
-
-  if (!encryptionKey) {
-    return {
-      success: false,
-      error: "Missing encryption key in localStorage. Please re-login.",
-    };
-  }
-
   const encrypted_password = await EncryptString(password, encryptionKey);
 
-  return await MakeApiCall("/v1/password/create", "POST", {
+  return await MakeApiCall("/v1/password/", "POST", {
     title,
     description,
     username,
     password: encrypted_password,
     website,
     vault_id,
+  });
+};
+
+export const UpdatePassword = async ({
+  id,
+  title,
+  description,
+  username,
+  password,
+  website,
+  vault_id,
+  encryptionKey,
+}) => {
+  const encrypted_password = await EncryptString(password, encryptionKey);
+  return await MakeApiCall("/v1/password/", "PUT", {
+    id,
+    title,
+    vault_id,
+    description,
+    username,
+    password: encrypted_password,
+    website,
   });
 };

@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { BiShow } from "react-icons/bi";
 import { Toggle } from "@/components/ui/toggle";
 import { CreatePassword } from "@/api/handlers";
+import { useUserContext } from "@/contexts/UserContext";
 
 export function AddNewPassword({ setPasswords, vault_id }) {
   const [title, setTitle] = useState("");
@@ -28,6 +29,17 @@ export function AddNewPassword({ setPasswords, vault_id }) {
   const [website, setWebsite] = useState("");
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
+  const { encKey } = useUserContext();
+
+  const resetFields = () => {
+    setTitle("");
+    setDescription("");
+    setUsername("");
+    setPassword("");
+    setWebsite("");
+    setIsPasswordVisible(false);
+  };
+
   const handleCreatePassword = async () => {
     const response = await CreatePassword({
       title,
@@ -36,10 +48,12 @@ export function AddNewPassword({ setPasswords, vault_id }) {
       password,
       website,
       vault_id,
+      encryptionKey: encKey,
     });
     if (response.success) {
       toast.success("Password created successfully!");
       setPasswords((prev) => [...prev, response.data.password]);
+      resetFields();
     } else {
       if (response.error !== "") {
         toast.error(CapitalizeFirstLetter(response.error));

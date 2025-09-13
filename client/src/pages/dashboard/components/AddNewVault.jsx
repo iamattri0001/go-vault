@@ -21,11 +21,17 @@ export function AddNewVault({ setVaults }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  const resetFields = () => {
+    setTitle("");
+    setDescription("");
+  };
+
   const handleCreateVault = async () => {
     const response = await CreateVault(title, description);
     if (response.success) {
       toast.success("Vault created successfully!");
       setVaults((prev) => [...prev, response.data.vault]);
+      resetFields();
     } else {
       if (response.error !== "") {
         toast.error(CapitalizeFirstLetter(response.error));

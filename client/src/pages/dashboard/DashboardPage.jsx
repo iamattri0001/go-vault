@@ -24,7 +24,7 @@ const DashboardPage = () => {
     fetchVaults();
   }, []);
   return (
-    <section className="px-4 py-2">
+    <section className="px-6 py-2 scroll">
       <Navbar />
       <div className="mt-4 min-h-[80vh] flex flex-col">
         <div className="flex items-end justify-end">

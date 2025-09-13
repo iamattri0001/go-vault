@@ -85,3 +85,12 @@ export async function DecryptString(encryptedBase64, key) {
   const decoder = new TextDecoder();
   return decoder.decode(decrypted);
 }
+
+// utils/crypto.js
+export async function hashKey(key) {
+  const raw =
+    key instanceof CryptoKey ? await crypto.subtle.exportKey("raw", key) : key; // handle ArrayBuffer too
+
+  const hashBuffer = await crypto.subtle.digest("SHA-256", raw);
+  return btoa(String.fromCharCode(...new Uint8Array(hashBuffer))); // base64 string
+}

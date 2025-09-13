@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import PasswordItem from "./PasswordItem";
 
-const PasswordsList = ({ passwords, setPasswords }) => {
+const PasswordsList = ({ passwords, setPasswords, vault_id }) => {
   useEffect(() => {
     // Scroll to the top of the list when passwords change
     const list = document.getElementById("passwords-list");
@@ -18,7 +18,11 @@ const PasswordsList = ({ passwords, setPasswords }) => {
       ) : (
         <div className="flex flex-col gap-4 w-full md:w-1/2 mt-4">
           {passwords.map((password) => (
-            <PasswordItem key={password.id} password={password} />
+            <PasswordItem
+              key={password.id}
+              password={password}
+              vault_id={vault_id}
+            />
           ))}
         </div>
       )}
