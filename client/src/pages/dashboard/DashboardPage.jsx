@@ -30,7 +30,9 @@ const DashboardPage = () => {
         <div className="flex items-end justify-end">
           <AddNewVault setVaults={setVaults} />
         </div>
-        <VaultsList vaults={vaults} setVaults={setVaults} />
+        <div className="flex-grow mt-4">
+          <VaultsList vaults={vaults} />
+        </div>
       </div>
     </section>
   );

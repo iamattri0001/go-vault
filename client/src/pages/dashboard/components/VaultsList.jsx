@@ -1,6 +1,6 @@
 import VaultItem from "./VaultItem";
 
-const VaultsList = ({ vaults, setVaults }) => {
+const VaultsList = ({ vaults }) => {
   return (
     <div className="flex-grow flex items-center justify-center">
       {vaults.length === 0 ? (

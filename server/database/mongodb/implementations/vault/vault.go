@@ -5,7 +5,6 @@ import (
 	"go-vault/database/models"
 	"go-vault/database/mongodb"
 	"go-vault/database/repository"
-	"time"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -41,7 +40,7 @@ func (r *VaultRepositoryImpl) DeleteByID(id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.VaultCollection)
-	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"deleted_at": time.Now()}})
+	_, err := collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
 
@@ -50,7 +49,7 @@ func (r *VaultRepositoryImpl) GetByID(id uuid.UUID) (*models.Vault, error) {
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.VaultCollection)
 	var vault models.Vault
-	err := collection.FindOne(ctx, bson.M{"_id": id, "deleted_at": nil}).Decode(&vault)
+	err := collection.FindOne(ctx, bson.M{"_id": id}).Decode(&vault)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +61,7 @@ func (r *VaultRepositoryImpl) GetByUserID(userID uuid.UUID) ([]*models.Vault, er
 	defer cancel()
 	mongoCollection := r.mongoDB.GetDatabase().Collection(mongodb.VaultCollection)
 	vaults := make([]*models.Vault, 0)
-	cursor, err := mongoCollection.Find(ctx, bson.M{"user_id": userID, "deleted_at": nil})
+	cursor, err := mongoCollection.Find(ctx, bson.M{"user_id": userID})
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +80,6 @@ func (r *VaultRepositoryImpl) ExistsByUserIdAndTitle(userID uuid.UUID, title str
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.VaultCollection)
-	var vault models.Vault
-	err := collection.FindOne(ctx, bson.M{"user_id": userID, "title": title, "deleted_at": nil}).Decode(&vault)
-	return err == nil && vault.ID != uuid.Nil
+	count, _ := collection.CountDocuments(ctx, bson.M{"user_id": userID, "title": title, "deleted_at": nil})
+	return count > 0
 }

@@ -5,7 +5,6 @@ import (
 	"go-vault/database/models"
 	"go-vault/database/mongodb"
 	"go-vault/database/repository"
-	"time"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -41,7 +40,7 @@ func (r *PasswordRepositoryImpl) DeleteByID(id uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.PasswordCollection)
-	_, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": bson.M{"deleted_at": time.Now()}})
+	_, err := collection.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
 
@@ -50,7 +49,7 @@ func (r *PasswordRepositoryImpl) GetByID(id uuid.UUID) (*models.Password, error)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.PasswordCollection)
 	var password models.Password
-	err := collection.FindOne(ctx, bson.M{"_id": id, "deleted_at": nil}).Decode(&password)
+	err := collection.FindOne(ctx, bson.M{"_id": id}).Decode(&password)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +61,7 @@ func (r *PasswordRepositoryImpl) GetByVaultID(vaultID uuid.UUID) ([]*models.Pass
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.PasswordCollection)
 	passwords := make([]*models.Password, 0)
-	cursor, err := collection.Find(ctx, bson.M{"vault_id": vaultID, "deleted_at": nil})
+	cursor, err := collection.Find(ctx, bson.M{"vault_id": vaultID})
 	if err != nil {
 		return nil, err
 	}
@@ -81,7 +80,7 @@ func (r *PasswordRepositoryImpl) DeleteByVaultID(vaultID uuid.UUID) error {
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.PasswordCollection)
-	_, err := collection.UpdateMany(ctx, bson.M{"vault_id": vaultID}, bson.M{"$set": bson.M{"deleted_at": time.Now()}})
+	_, err := collection.DeleteMany(ctx, bson.M{"vault_id": vaultID})
 	return err
 }
 
@@ -89,7 +88,6 @@ func (r *PasswordRepositoryImpl) ExistsByVaultIDAndTitle(vaultID uuid.UUID, titl
 	ctx, cancel := context.WithTimeout(context.Background(), r.mongoDB.QueryTimeout)
 	defer cancel()
 	collection := r.mongoDB.GetDatabase().Collection(mongodb.PasswordCollection)
-	var password models.Password
-	err := collection.FindOne(ctx, bson.M{"vault_id": vaultID, "title": title, "deleted_at": nil}).Decode(&password)
-	return err == nil && password.ID != uuid.Nil
+	count, _ := collection.CountDocuments(ctx, bson.M{"vault_id": vaultID, "title": title, "deleted_at": nil})
+	return count > 0
 }

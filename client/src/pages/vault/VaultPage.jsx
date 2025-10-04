@@ -45,11 +45,13 @@ const VaultPage = () => {
           </div>
           <AddNewPassword setPasswords={setPasswords} vault_id={vault_id} />
         </div>
-        <PasswordsList
-          passwords={passwords}
-          setPasswords={setPasswords}
-          vault_id={vault_id}
-        />
+        <div className="flex-grow mt-4">
+          <PasswordsList
+            passwords={passwords}
+            setPasswords={setPasswords}
+            vault_id={vault_id}
+          />
+        </div>
       </div>
     </section>
   );
